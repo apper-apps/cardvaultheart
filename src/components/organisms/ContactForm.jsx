@@ -78,14 +78,41 @@ const ContactForm = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      onSave(formData);
-      toast.success("Contact saved successfully!", {
-        icon: <ApperIcon name="CheckCircle" size={20} />
-      });
+      try {
+        await onSave(formData);
+        toast.success("Contact saved successfully!", {
+          icon: <ApperIcon name="CheckCircle" size={20} />
+        });
+      } catch (error) {
+        // Handle storage-specific errors with user-friendly messages
+        if (error.message.startsWith('STORAGE_FULL:')) {
+          const details = error.message.split(':')[1];
+          toast.error(`Storage quota exceeded. ${details}`, {
+            icon: <ApperIcon name="AlertTriangle" size={20} />,
+            autoClose: 8000
+          });
+        } else if (error.message.startsWith('STORAGE_CLEANED:')) {
+          const details = error.message.split(':')[1];
+          toast.warning(`Contact saved. ${details}`, {
+            icon: <ApperIcon name="Info" size={20} />,
+            autoClose: 6000
+          });
+        } else if (error.message.startsWith('STORAGE_SEVERELY_CLEANED:')) {
+          const details = error.message.split(':')[1];
+          toast.warning(`Contact saved with cleanup. ${details}`, {
+            icon: <ApperIcon name="AlertTriangle" size={20} />,
+            autoClose: 10000
+          });
+        } else {
+          toast.error("Failed to save contact. Please try again.", {
+            icon: <ApperIcon name="AlertCircle" size={20} />
+          });
+        }
+      }
     } else {
       toast.error("Please fix the errors before saving", {
         icon: <ApperIcon name="AlertCircle" size={20} />
