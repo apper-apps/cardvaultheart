@@ -90,9 +90,9 @@ class OCRService {
   }
 
   validateExtractedData(data) {
-    const validations = {
+const validations = {
       email: data.email ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) : true,
-      phone: data.phone ? /^[\d\s\-\+\(\)]+$/.test(data.phone) : true,
+      phone: data.phone ? /^[\d\s\-+()]+$/.test(data.phone) : true,
       website: data.website ? /^https?:\/\/.+/.test(data.website) : true
     };
 
